@@ -1,12 +1,63 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const validate = require('mongoose-validate')
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, unique: true },
+  firstName: {
+    type: String
+    // required: true,
+  },
+
+  lastName: {
+    type: String
+    // required: true,
+  },
+
+  username: {
+    type: String,
+    // required: true,
+    lowercase: true,
+    unique: true,
+    match: /^[\w][\w\-\.]*[\w]$/i
+  },
+
+  rooms: [{
+    type: ObjectId,
+    ref: 'Room'
+  }],
+
+  reports: [{
+    type: ObjectId,
+    ref: 'Report'
+  }],
+
+  messages: [{
+    type: ObjectId,
+    ref: 'Message'
+  }],
+    
+  email: {
+    type: String,
+    // required: true,
+    unique: true,
+    lowercase: true,
+    validate: [ validate.email, 'invalid email address' ]
+  },
+
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+
+  joined: {
+    type: Date,
+    default: Date.now
+  },
+
+  admin: {
+    type: Boolean,
+    default: false
+  },
 
   facebook: String,
   twitter: String,
@@ -15,15 +66,7 @@ const userSchema = new mongoose.Schema({
   instagram: String,
   linkedin: String,
   steam: String,
-  tokens: Array,
-
-  profile: {
-    name: String,
-    gender: String,
-    location: String,
-    website: String,
-    picture: String
-  }
+  tokens: Array
 }, { timestamps: true });
 
 /**

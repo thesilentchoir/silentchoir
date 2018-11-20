@@ -34,6 +34,8 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
+const reportController = require('./controllers/report');
+const roomController = require('./controllers/room');
 
 /**
  * API keys and Passport configuration.
@@ -142,6 +144,22 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
+/**
+ * Report routes
+ */
+app.get('/reports', reportController.listReports)
+app.get('/reports/new', reportController.getNewReport)
+app.post('/reports/new', reportController.postNewReport)
+app.get('/reports/:id', reportController.showReport)
+app.get('/reports/:id/edit', reportController.getUpdateReport)
+app.post('/reports/:id/edit', reportController.postUpdateReport)
+
+
+/**
+ * Room routes
+ */
+app.get('/rooms', roomController.listRooms)
 
 /**
  * API examples routes.

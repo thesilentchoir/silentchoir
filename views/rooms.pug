@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .page-header
+    h3 Rooms
+
+  ul
+    for room in rooms
+      li= room.alleged_party
+      li= room
