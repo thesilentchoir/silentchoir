@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>The Silent Choir Project</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+        <script src="js/init.js"></script>
+    </head>
+    <body class="body">
+
+        <nav class="navbar navbar-static-top">
+        </nav>
+        
+        <div class="container">
+            <!--AS: Would like to figure out a way to style these questions better-->
+            <h3 class="headerQuestion">With whom have you discussed your incident with?</h3>
+            <p class="formText">*Please select all that apply</p>
+
+            <form class="formText">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="A mental health professional" id="A mental health professional">
+                <label class="form-check-label" for="A mental health professional">
+                A mental health professional
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Friends" id="Friends">
+                <label class="form-check-label" for="Friends">
+                Friends
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Family" id="Family">
+                <label class="form-check-label" for="Family">
+                Family
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="An employer" id="An employer">
+                <label class="form-check-label" for="An employer">
+                An employer
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Publicly" id="Publicly">
+                <label class="form-check-label" for="Publicly">
+                Publicly
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="I haven't discussed with anyone" id="I haven't discussed with anyone">
+                <label class="form-check-label" for="I haven't discussed with anyone">
+                I haven't discussed with anyone
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Other" id="Other">
+                <label class="form-check-label" for="Other">
+                Other
+                </label>
+                <input type="text" name="Other" class="form-control form-control-sm" placeholder="Please enter with whom you have discussed your incident with">
+            </div>
+
+            <br>
+
+            <div>
+              <h3 class="headerQuestion">How comfortable are you talking about your incident?</h3>
+            
+              <br>
+              
+              <div class="form-check">
+                      <input class="form-check-input" type="radio" name="comfortLevel" id="comfortLevel1" value="Even thinking about it gives me severe anxiety and I never discuss it.">
+                      <label class="form-check-label" for="comfortLevel1">
+                     Even thinking about it gives me severe anxiety and I never discuss it.
+                      </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="radio" name="comfortLevel" id="comfortLevel2" value="Only in very intimate settings have I been able to talk about my experiences.">
+                  <label class="form-check-label" for="comfortLevel2">
+                 Only in very intimate settings have I been able to talk about my experiences.
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="radio" name="comfortLevel" id="comfortLevel3" value="I’m not always ready to discuss what happened, but I have had been able to do so in the past.">
+                  <label class="form-check-label" for="comfortLevel3">
+                 I’m not always ready to discuss what happened, but I have been able to do so in the past.
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="radio" name="comfortLevel" id="comfortLevel4" value="It’s never easy, but I am able to share my experience with others and continue functioning reasonably well afterward.">
+                  <label class="form-check-label" for="comfortLevel4">
+                 It’s never easy, but I am able to share my experience with others and continue functioning reasonably well afterward.
+                  </label>
+              </div>
+              <div class="form-check">
+                      <input class="form-check-input" type="radio" name="comfortLevel" id="comfortLevel5" value="I can share my experience in detail, have done so in the past and will do so in the future.">
+                      <label class="form-check-label" for="comfortLevel5">
+                     I can share my experience in detail, have done so in the past, and will do so in the future.
+                      </label>
+              </div> 
+            </div> 
+
+            <div class="form-actions">
+                <a href="legal.html"><button type="button" class="btn btn-default customButton">Continue with my report</button></a>
+                <br>
+                <small><a style="color:#91b735;" data-toggle="modal" data-target="#takeMeHomeModal">I want to terminate my report and any information submitted to this point.</a></small>
+            </div>
+
+            </form>
+
+            <!-- I'd like to style the Modal to be a different background color. -->
+            <div class="modal fade" id="takeMeHomeModal" tabindex="-1" role="dialog" aria-labelledby="takeMeHomeModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="takeMeHomeModalLabel">Are you sure you want to leave your report?</h5>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Need to come up with actual text for this -->
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam ligula, vestibulum eu facilisis nec, rutrum ac enim. Sed pulvinar elit purus, et ultrices velit lobortis sed. Pellentesque lobortis congue rhoncus. Nulla euismod magna lorem, in tempor ex elementum ut. Vestibulum fringilla enim ligula, pulvinar ullamcorper tellus finibus vel. Aliquam erat volutpat. Mauris et enim lorem. Quisque sit amet erat arcu. Sed id interdum orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus mattis lectus vitae nulla vehicula dictum. Pellentesque justo eros, cursus et lacus a, posuere pharetra elit. Nullam luctus risus eu lacus sagittis vulputate. Vestibulum consectetur nisi a sem viverra, quis lacinia dui vestibulum.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-default" href="index.html" role="button">Take me home</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="footer">
+                Note: If anything in this questionnaire makes you feel uncomfortable or induces any unwanted stress, please do not hesitate to use the <a style="color:#91b735;" href="https://rainn.org/about-national-sexual-assault-telephone-hotline" target="_blank">National Sexual Assault Telephone Hotline</a> (800.656.HOPE (4673)) to be connected with a trained staff member from a sexual assault service provider in your area. This hotline is operated by <a style="color:#91b735;" href="https://www.rainn.org/" target="_blank">RAINN</a> who can provide counseling and advisory services for survivors.
+            </div>
+        </div>
+    </body>
+</html>

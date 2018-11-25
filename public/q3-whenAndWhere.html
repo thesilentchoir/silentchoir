@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+      <meta charset="utf-8">
+      <title>The Silent Choir Project</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="css/main.css">
+      <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+      <script src="js/init.js"></script>
+    </head>
+    <body class="body">
+       
+        <nav class="navbar navbar-static-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="index.html">
+                <img src="/img/SilentChoir_Logo-WHITE.png" alt="Silent Choir Logo">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Resources<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <!-- thought it might be nice to include some resources here, these need to be filled in -->
+                        <li><a href="#" target="_blank">placeholder1</a></li>
+                        <li><a href="#" target="_blank">placeholder2</a></li>
+                        <li><a href="#" target="_blank">placeholder3</a></li>
+                    </ul>
+                </li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">About us<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" target="_blank">Who we are</a></li>
+                        <li><a href="inquire.html" target="_blank">Inquire</a></li>
+                        <!-- we need to make sure the project is set up to go public before our app is live -->
+                        <li><a href="https://github.com/tabdollahi/silentchoir" target="_blank">Github</a></li>
+                    </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+       
+        <div class="container">
+            <!--AS: Would like to figure out a way to style these questions better-->
+            <h3 class="headerQuestion">When and where did the incident you are reporting take place?</h3>
+            <p class="formText">*Please be as accurate as you can.</p>
+
+            <form class="formText">
+                
+                <div class="input-group date" data-provide="datepicker">
+                    <!-- <label for="datepicker">Date</label> -->
+                    <input type="text" class="form-control" id="datepicker" placeholder = "MM/DD/YYYY">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Estimated" id="Estimated">
+                    <label class="form-check-label" for="Estimated">Estimated</label>
+                    <small class="form-text text-muted">(Please check if the date selected is estimated.)</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="inputCity">City</label>
+                      <input type="text" class="form-control" id="inputCity">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="inputState">State</label>
+                      <select id="inputState" class="form-control">
+                        <option selected>Choose...</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="AR">Arkansas</option>
+                        <option value="CA">California</option>
+                        <option value="CO">Colorado</option>
+                        <option value="CT">Connecticut</option>
+                        <option value="DE">Delaware</option>
+                        <option value="DC">District Of Columbia</option>
+                        <option value="FL">Florida</option>
+                        <option value="GA">Georgia</option>
+                        <option value="HI">Hawaii</option>
+                        <option value="ID">Idaho</option>
+                        <option value="IL">Illinois</option>
+                        <option value="IN">Indiana</option>
+                        <option value="IA">Iowa</option>
+                        <option value="KS">Kansas</option>
+                        <option value="KY">Kentucky</option>
+                        <option value="LA">Louisiana</option>
+                        <option value="ME">Maine</option>
+                        <option value="MD">Maryland</option>
+                        <option value="MA">Massachusetts</option>
+                        <option value="MI">Michigan</option>
+                        <option value="MN">Minnesota</option>
+                        <option value="MS">Mississippi</option>
+                        <option value="MO">Missouri</option>
+                        <option value="MT">Montana</option>
+                        <option value="NE">Nebraska</option>
+                        <option value="NV">Nevada</option>
+                        <option value="NH">New Hampshire</option>
+                        <option value="NJ">New Jersey</option>
+                        <option value="NM">New Mexico</option>
+                        <option value="NY">New York</option>
+                        <option value="NC">North Carolina</option>
+                        <option value="ND">North Dakota</option>
+                        <option value="OH">Ohio</option>
+                        <option value="OK">Oklahoma</option>
+                        <option value="OR">Oregon</option>
+                        <option value="PA">Pennsylvania</option>
+                        <option value="RI">Rhode Island</option>
+                        <option value="SC">South Carolina</option>
+                        <option value="SD">South Dakota</option>
+                        <option value="TN">Tennessee</option>
+                        <option value="TX">Texas</option>
+                        <option value="UT">Utah</option>
+                        <option value="VT">Vermont</option>
+                        <option value="VA">Virginia</option>
+                        <option value="WA">Washington</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WY">Wyoming</option>
+                      </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputPlace">Place</label>
+                    <input type="text" class="form-control" id="inputPlace">
+                </div>
+
+                <br>
+
+                <div class="form-actions">
+                    <a href="q4-setting.html"><button type="button" class="btn btn-default customButton">Continue with my report</button></a>
+                    <br>
+                    <small><a style="color:#91b735;" data-toggle="modal" data-target="#takeMeHomeModal">I want to terminate my report and any information submitted to this point.</a></small>
+                </div>
+
+            </form>
+
+            <!-- I'd like to style the Modal to be a different background color. -->
+            <div class="modal fade" id="takeMeHomeModal" tabindex="-1" role="dialog" aria-labelledby="takeMeHomeModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="takeMeHomeModalLabel">Are you sure you want to leave your report?</h5>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Need to come up with actual text for this -->
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam ligula, vestibulum eu facilisis nec, rutrum ac enim. Sed pulvinar elit purus, et ultrices velit lobortis sed. Pellentesque lobortis congue rhoncus. Nulla euismod magna lorem, in tempor ex elementum ut. Vestibulum fringilla enim ligula, pulvinar ullamcorper tellus finibus vel. Aliquam erat volutpat. Mauris et enim lorem. Quisque sit amet erat arcu. Sed id interdum orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus mattis lectus vitae nulla vehicula dictum. Pellentesque justo eros, cursus et lacus a, posuere pharetra elit. Nullam luctus risus eu lacus sagittis vulputate. Vestibulum consectetur nisi a sem viverra, quis lacinia dui vestibulum.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="index.html"><button type="button" class="btn btn-default">Take me home</button></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="footer">
+                Note: If anything in this questionnaire makes you feel uncomfortable or induces any unwanted stress, please do not hesitate to use the <a style="color:#91b735;" href="https://rainn.org/about-national-sexual-assault-telephone-hotline" target="_blank">National Sexual Assault Telephone Hotline</a> (800.656.HOPE (4673)) to be connected with a trained staff member from a sexual assault service provider in your area. This hotline is operated by <a style="color:#91b735;" href="https://www.rainn.org/" target="_blank">RAINN</a> who can provide counseling and advisory services for survivors.
+            </div>
+        </div>
+    </body>
+</html>

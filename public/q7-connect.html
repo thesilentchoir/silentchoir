@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>The Silent Choir Project</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+        <script src="js/init.js"></script>
+    </head>
+    <body class="body">
+
+        <nav class="navbar navbar-static-top">
+        </nav>
+        
+        <div class="container formText">
+            <p>The purpose of our platform is to uncover patterns of abuse. To do this, we need your permission to privately connect you with other survivors who may have experienced misconduct or abuse at the hands of the same offender.</p>
+
+            <p>You are anonymous on The Silent Choir. When connecting you with other survivors you will stay anonymous. Here’s what will happen.</p>
+
+            <ol>
+                <li>If we find other survivors we would like to connect you with, you will receive an email asking for permission to connect you with these survivors.</li>
+                <li>If you consent to being connected to survivors, we will connect you with these survivors anonymously - they will not see your email address or any part of your report.</li>
+                <li>You will be able to establish a conversation with other survivors via secure chat or email, and it will be your choice to continue the conversation, walk away from the conversation, to stay anonymous or reveal your identity... it’s all up to you.</li>
+            </ol>
+
+            <!--AS: Would like to figure out a way to style these questions better-->
+            <h3 class="headerQuestion">With this in mind, do you authorize us to contact you, via the email address you provided, if we find other survivors who have a shared experience with you?</h3>
+            
+            <br>
+
+            <form class="formText">
+                <!-- [OPEN QUESTION] What do we do if user selects YES here, this will likely come from feedback from lawyers/therapists. -->
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="connect" id="connect-yes" value="Yes">
+                    <label class="form-check-label" for="connect-yes">Yes</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="connect" id="connect-no" value="No">
+                    <label class="form-check-label" for="connnect-no">No</label>
+                </div>
+                <!--If this option is selected, we need to email resources to user with further information -->
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="connect" id="connect-notSure" value="I’m not sure, please send me more information.">
+                    <label class="form-check-label" for="connect-notSure">I’m not sure, please send me more information.</label>
+                </div>
+                                
+            <br>
+
+                <div class="form-actions">
+                    <a href="q8-resources.html"><button type="button" class="btn btn-default customButton">Continue with my report</button></a>
+                    <br>
+                    <small><a style="color:#91b735;" data-toggle="modal" data-target="#takeMeHomeModal">I want to terminate my report and any information submitted to this point.</a></small>
+                </div>
+
+            </form>
+
+            <!-- I'd like to style the Modal to be a different background color. -->
+            <div class="modal fade" id="takeMeHomeModal" tabindex="-1" role="dialog" aria-labelledby="takeMeHomeModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="takeMeHomeModalLabel">Are you sure you want to leave your report?</h5>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Need to come up with actual text for this -->
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam ligula, vestibulum eu facilisis nec, rutrum ac enim. Sed pulvinar elit purus, et ultrices velit lobortis sed. Pellentesque lobortis congue rhoncus. Nulla euismod magna lorem, in tempor ex elementum ut. Vestibulum fringilla enim ligula, pulvinar ullamcorper tellus finibus vel. Aliquam erat volutpat. Mauris et enim lorem. Quisque sit amet erat arcu. Sed id interdum orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus mattis lectus vitae nulla vehicula dictum. Pellentesque justo eros, cursus et lacus a, posuere pharetra elit. Nullam luctus risus eu lacus sagittis vulputate. Vestibulum consectetur nisi a sem viverra, quis lacinia dui vestibulum.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="index.html"><button type="button" class="btn btn-default">Take me home</button></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="footer">
+                Note: If anything in this questionnaire makes you feel uncomfortable or induces any unwanted stress, please do not hesitate to use the <a style="color:#91b735;" href="https://rainn.org/about-national-sexual-assault-telephone-hotline" target="_blank">National Sexual Assault Telephone Hotline</a> (800.656.HOPE (4673)) to be connected with a trained staff member from a sexual assault service provider in your area. This hotline is operated by <a style="color:#91b735;" href="https://www.rainn.org/" target="_blank">RAINN</a> who can provide counseling and advisory services for survivors.
+            </div>
+        </div>
+    </body>
+</html>
