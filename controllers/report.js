@@ -23,25 +23,40 @@ exports.postNewReport = (req, res) => {
 
   let alleged_party_check = req.body.alleged_party;
 
-  let room = new Room(
-    {
-      alleged_party: alleged_party_check
-    }
-  );
-
-  room.save();
-
-  // let room_find = Room.find({ alleged_party: alleged_party_check });
-
-  console.log(room);
-
   let report = new Report(
     {
       username: req.body.username,
       alleged_party: req.body.alleged_party,
-      room: room._id
+      user: req.user
     }
   );
+
+  Room.findOne({ alleged_party: alleged_party_check }, function(err, room) {
+    if (err) {
+        console.log("MongoDB Error: " + err);
+        return false;
+    };
+
+    if (!room) {
+      console.log("Room not found!");
+      let room = new Room(
+        {
+          alleged_party: alleged_party_check
+        }
+      )
+      room.participants.push(req.user);
+      room.save();
+      report.room = room;
+      return room;
+    } else {
+        console.log("Found one room: " + room.alleged_party);
+        // console.log(room);
+        room.participants.push(req.user);
+        room.save();
+        report.room = room;
+        return room;
+    };
+  });
 
   report.save(function (err) {
     if (err) {

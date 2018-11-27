@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
-const validate = require('mongoose-validate')
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -36,13 +36,12 @@ const userSchema = new mongoose.Schema({
     type: ObjectId,
     ref: 'Message'
   }],
-    
+
   email: {
     type: String,
     // required: true,
     unique: true,
-    lowercase: true,
-    validate: [ validate.email, 'invalid email address' ]
+    lowercase: true
   },
 
   password: String,
