@@ -36,7 +36,6 @@ exports.postNewReport = (req, res) => {
         console.log("MongoDB Error: " + err);
         return false;
     };
-
     if (!room) {
       console.log("Room not found!");
       let room = new Room(
@@ -46,14 +45,19 @@ exports.postNewReport = (req, res) => {
       )
       room.participants.push(req.user);
       room.save();
-      report.room = room;
       return room;
     } else {
         console.log("Found one room: " + room.alleged_party);
-        // console.log(room);
-        room.participants.push(req.user);
-        room.save();
-        report.room = room;
+
+        let participantsObject = room.participants;
+        let participantStringsArray = participantsObject.map(id => JSON.stringify(id));
+
+        let idCheck = JSON.stringify(req.user.id);
+
+        if (!participantStringsArray.includes(idCheck)) {
+          room.participants.push(req.user);
+          room.save();
+        }
         return room;
     };
   });

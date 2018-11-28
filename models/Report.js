@@ -12,11 +12,6 @@ const reportSchema = new mongoose.Schema({
     required: true
   },
 
-  room: {
-    type: ObjectId,
-    ref: 'Room'
-  },
-
   user: {
     type: ObjectId,
     ref: 'User'
