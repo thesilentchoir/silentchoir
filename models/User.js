@@ -22,21 +22,6 @@ const userSchema = new mongoose.Schema({
     match: /^[\w][\w\-\.]*[\w]$/i
   },
 
-  rooms: [{
-    type: ObjectId,
-    ref: 'Room'
-  }],
-
-  reports: [{
-    type: ObjectId,
-    ref: 'Report'
-  }],
-
-  messages: [{
-    type: ObjectId,
-    ref: 'Message'
-  }],
-
   email: {
     type: String,
     // required: true,
