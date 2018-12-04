@@ -3,18 +3,9 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const reportSchema = new mongoose.Schema({
-  username: {
-    type: String
-  },
-
   alleged_party: {
     type: String,
     required: true
-  },
-
-  user: {
-    type: ObjectId,
-    ref: 'User'
   }
 });
 
