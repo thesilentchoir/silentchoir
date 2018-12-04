@@ -1,18 +1,12 @@
 const Report = require('../models/Report.js');
 const Room = require('../models/Room');
 
-exports.listReports = (req, res) => {
-  Report.find((err, docs) => {
-    res.render('reports', { reports: docs });
-  });
-};
-
 exports.getNewReport = (req, res) => {
   res.render('reports/new')
-};
+}
 
-exports.postNewReport = (req, res) => {
-  req.assert('username', 'Username cannot be blank').notEmpty();
+exports.createReport = (req, res) => {
+  req.assert('alleged_party', 'Accused party cannot be blank').notEmpty();
 
   const errors = req.validationErrors();
 
@@ -25,19 +19,26 @@ exports.postNewReport = (req, res) => {
 
   let report = new Report(
     {
-      username: req.body.username,
       alleged_party: req.body.alleged_party,
-      user: req.user
     }
   );
 
-  Room.findOne({ alleged_party: alleged_party_check }, function(err, room) {
+  function retrieveRoom(alleged_party_check, callback) {
+  Room.find({alleged_party: alleged_party_check}, function(err, rooms) {
     if (err) {
-        console.log("MongoDB Error: " + err);
-        return false;
-    };
-    if (!room) {
-      console.log("Room not found!");
+      callback(err, null);
+      } else {
+      callback(null, rooms[0]);
+      }
+    });
+  };
+
+  retrieveRoom(alleged_party_check, function(err, room) {
+    if (err) {
+      console.log(err);
+    }
+
+    if (room === undefined) {
       let room = new Room(
         {
           alleged_party: alleged_party_check
@@ -45,47 +46,50 @@ exports.postNewReport = (req, res) => {
       )
       room.participants.push(req.user);
       room.save();
-      return room;
     } else {
-        console.log("Found one room: " + room.alleged_party);
+      let participantsObject = room.participants;
+      let participantStringsArray = participantsObject.map(id => JSON.stringify(id));
 
-        let participantsObject = room.participants;
-        let participantStringsArray = participantsObject.map(id => JSON.stringify(id));
+      let idCheck = JSON.stringify(req.user.id);
 
-        let idCheck = JSON.stringify(req.user.id);
-
-        if (!participantStringsArray.includes(idCheck)) {
-          room.participants.push(req.user);
-          room.save();
-        }
-        return room;
-    };
+      if (!participantStringsArray.includes(idCheck)) {
+        room.participants.push(req.user);
+        room.save();
+      }
+    }
   });
 
   report.save(function (err) {
     if (err) {
       return next(err);
     }
+
     Report.find((err, docs) => {
       res.render('reports', { reports: docs });
     });
-  })
+  });
+}
+
+
+exports.listReports = (req, res) => {
+  Report.find((err, docs) => {
+    res.render('reports', { reports: docs });
+  });
 };
 
 exports.showReport = (req, res) => {
-  Report.findById(req.params.id, (err, report) => {
+  Report.findById(req.params.reportId, (err, report) => {
     res.render('reports/show', { report: report });
-  })
+  });
 }
 
 exports.getUpdateReport = (req, res) => {
-  Report.findById(req.params.id, (err, report) => {
+  Report.findById(req.params.reportId, (err, report) => {
     res.render('reports/edit', { report: report });
   })
 }
 
-exports.postUpdateReport = (req, res) => {
-  req.assert('username', 'Username cannot be blank').notEmpty();
+exports.putUpdateReport = (req, res) => {
   req.assert('alleged_party', 'Accused party cannot be blank').notEmpty();
 
   const errors = req.validationErrors();
@@ -95,14 +99,34 @@ exports.postUpdateReport = (req, res) => {
     return res.redirect('reports/edit');
   }
 
-  Report.findById(req.params.id, (err, report) => {
+  Report.findById(req.params.reportId, (err, report) => {
     if (err) { return next(err); }
-    report.username = req.body.username;
     report.alleged_party = req.body.alleged_party;
     report.save((err) => {
       if (err) { return next(err); }
       req.flash('success', { msg: 'Username has been changed.' });
-      res.redirect('/reports/:id/edit');
+      res.redirect('/reports/:reportId');
+    });
+  });
+}
+
+exports.deleteReport = (req, res) => {
+  Report.findByIdAndRemove(req.params.reportId)
+  .then(report => {
+    if (!report) {
+      return res.status(404).send({
+        message: "Report not found!"
+      });
+    }
+    res.send({message: "Report deleted successfully."});
+  }).catch(err => {
+    if(err.kind === 'ObjectId' || err.name === 'NotFound') {
+      return res.status(404).send({
+        message: "Report not found: " + req.params.reportId
+      });
+    }
+    return res.status(500).send({
+      message: "Could not delete report: " + req.params.reportId
     });
   });
 }

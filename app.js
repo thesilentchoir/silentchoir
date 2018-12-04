@@ -36,6 +36,7 @@ const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const reportController = require('./controllers/report');
 const roomController = require('./controllers/room');
+const messageController = require('./controllers/message');
 
 /**
  * API keys and Passport configuration.
@@ -148,18 +149,28 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 /**
  * Report routes
  */
-app.get('/reports', reportController.listReports)
-app.get('/reports/new', reportController.getNewReport)
-app.post('/reports/new', reportController.postNewReport)
-app.get('/reports/:id', reportController.showReport)
-app.get('/reports/:id/edit', reportController.getUpdateReport)
-app.post('/reports/:id/edit', reportController.postUpdateReport)
+app.get('/reports', reportController.getNewReport)
+app.post('/reports', reportController.createReport)
+app.get('/reports/:reportId', reportController.showReport)
+app.get('/reports/:reportId', reportController.getUpdateReport)
+app.put('/reports/:reportId', reportController.putUpdateReport)
+app.delete('/reports/:reportId', reportController.deleteReport)
 
 
 /**
  * Room routes
  */
 app.get('/rooms', roomController.listRooms)
+app.get('/rooms/:roomId', roomController.showRoom)
+app.delete('/rooms/:roomId', roomController.deleteRoom)
+
+/**
+ * Messages routes
+ */
+app.get('/rooms/:roomId/messages', messageController.getNewMessage)
+app.post('/rooms/:roomId/messages', messageController.createMessage)
+app.get('/rooms/:roomId/messages', messageController.listMessages)
+app.get('/rooms/:roomId/messages/:messageId', messageController.deleteMessage)
 
 /**
  * API examples routes.
