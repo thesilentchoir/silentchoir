@@ -149,28 +149,28 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 /**
  * Report routes
  */
-app.get('/reports', reportController.getNewReport)
-app.post('/reports', reportController.createReport)
-app.get('/reports/:reportId', reportController.showReport)
-app.get('/reports/:reportId', reportController.getUpdateReport)
-app.put('/reports/:reportId', reportController.putUpdateReport)
-app.delete('/reports/:reportId', reportController.deleteReport)
+app.get('/reports', passportConfig.isAuthenticated, reportController.getNewReport)
+app.post('/reports', passportConfig.isAuthenticated, reportController.createReport)
+app.get('/reports/:reportId', passportConfig.isAuthenticated, reportController.showReport)
+app.get('/reports/:reportId', passportConfig.isAuthenticated, reportController.getUpdateReport)
+app.put('/reports/:reportId', passportConfig.isAuthenticated, reportController.putUpdateReport)
+app.delete('/reports/:reportId', passportConfig.isAuthenticated, reportController.deleteReport)
 
 
 /**
  * Room routes
  */
-app.get('/rooms', roomController.listRooms)
-app.get('/rooms/:roomId', roomController.showRoom)
-app.delete('/rooms/:roomId', roomController.deleteRoom)
+app.get('/rooms', passportConfig.isAuthenticated, roomController.listRooms)
+app.get('/rooms/:roomId', passportConfig.isAuthenticated, roomController.showRoom)
+app.delete('/rooms/:roomId', passportConfig.isAuthenticated, roomController.deleteRoom)
 
 /**
  * Messages routes
  */
-app.get('/rooms/:roomId/messages', messageController.getNewMessage)
-app.post('/rooms/:roomId/messages', messageController.createMessage)
-app.get('/rooms/:roomId/messages', messageController.listMessages)
-app.get('/rooms/:roomId/messages/:messageId', messageController.deleteMessage)
+app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.getNewMessage)
+app.post('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.createMessage)
+app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.listMessages)
+app.get('/rooms/:roomId/messages/:messageId', passportConfig.isAuthenticated, messageController.deleteMessage)
 
 /**
  * API examples routes.
