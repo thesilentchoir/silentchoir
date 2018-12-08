@@ -8,6 +8,16 @@ exports.listRooms = (req, res) => {
 
 exports.showRoom = (req, res) => {
   Room.findById(req.params.roomId, (err, room) => {
+    let participantsObject = room.participants;
+    let participantStringsArray = participantsObject.map(id => JSON.stringify(id));
+
+    let idCheck = JSON.stringify(req.user.id);
+
+    if (!participantStringsArray.includes(idCheck)) {
+      req.flash('errors', { msg: 'Oops! Please pick a chatroom of which you are a member.' });
+      return res.redirect('/account');
+    }
+
     res.render('rooms/show', { room: room });
   })
 }
