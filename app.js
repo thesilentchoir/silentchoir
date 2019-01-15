@@ -125,26 +125,58 @@ app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/d
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
 app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
 
+// const ExpressBrute = require('express-brute')
+// const ExpressBruteMongooseStore = require('express-brute-mongoose')
+//
+// const EBstore = new ExpressBruteMongooseStore(db.Bruteforce)
+// const bruteforce = new ExpressBrute(EBstore, {
+//   freeRetries: 5,
+//   minWait: 60 * 1000,
+//   maxWait: 5 * 60 * 1000,
+//   refreshTimeoutOnRequest: false,
+//   failCallback (req, res, next, nextValidRequestDate) {
+//     req.flash('alert', {
+//       class: 'error',
+//       title: lang.t('auth:errors.toomanyattempts'),
+//       message: lang.t('auth:errors.toomanyattemptsmsg', { time: moment(nextValidRequestDate).fromNow() }),
+//       iconClass: 'fa-times'
+//     })
+//     res.redirect('/login')
+//   }
+// })
+
 /**
  * Primary app routes.
  */
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
+app.post('/login',
+// bruteforce.prevent,
+userController.postLogin);
 app.get('/logout', userController.logout);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
 app.post('/reset/:token', userController.postReset);
-app.get('/signup', userController.getSignup);
-app.post('/signup', userController.postSignup);
+app.get('/signup', passportConfig.isAuthenticated, userController.getSignup);
+app.post('/signup', passportConfig.isAuthenticated, userController.postSignup);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
-app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
+app.get('/account', passportConfig.isAuthenticated, userController.getCurrentUserAccount);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+app.get('/accounts', passportConfig.isAuthenticated, userController.getAllUsers);
+app.get('/account/:accountId', passportConfig.isAuthenticated, userController.getOtherUserAccount);
+app.get('/invite', passportConfig.isAuthenticated, userController.getInviteUser);
+app.post('/invite', passportConfig.isAuthenticated, userController.postInviteUser);
+app.get('/invite/:token', userController.getInvite);
+app.post('/invite/:token', userController.postInvite);
+
+// need route for sending email
+// route getAccountReset
+// route postAccountReset
 
 /**
  * Report routes

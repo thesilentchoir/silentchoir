@@ -43,6 +43,18 @@ const userSchema = new mongoose.Schema({
     default: false
   },
 
+  inviteResetToken: String,
+  inviteResetExpires: Date,
+  inviteSent: {
+    type: Boolean,
+    default: false
+  },
+
+  // resetToken: {
+  //   token: String,
+  //   expires: Date
+  // },
+
   facebook: String,
   twitter: String,
   google: String,

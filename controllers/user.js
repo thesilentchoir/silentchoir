@@ -67,9 +67,10 @@ exports.logout = (req, res) => {
  * Signup page.
  */
 exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect('/');
+  if (!res.locals.user.admin) {
+    return res.render('error-forbidden')
   }
+
   res.render('account/signup', {
     title: 'Create Account'
   });
@@ -80,9 +81,13 @@ exports.getSignup = (req, res) => {
  * Create a new local account.
  */
 exports.postSignup = (req, res, next) => {
+  if (!res.locals.user.admin) {
+    return res.render('error-forbidden')
+  }
+
   req.assert('email', 'Email is not valid').isEmail();
-  req.assert('password', 'Password must be at least 4 characters long').len(4);
-  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+  // req.assert('password', 'Password must be at least 20 characters long').len(20);
+  // req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
@@ -92,11 +97,16 @@ exports.postSignup = (req, res, next) => {
     return res.redirect('/signup');
   }
 
+  // var expires = new Date();
+  // expires.setHours(expires.getHours() + 6);
+
+  // var seed = crypto.randomBytes(20);
+  // var authToken = crypto.createHash('sha1').update(seed + req.body.email).digest('hex');
+
   const user = new User({
     username: req.body.username,
     email: req.body.email,
-    password: req.body.password,
-    admin: req.body.admin
+    password: req.body.password
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
@@ -121,9 +131,30 @@ exports.postSignup = (req, res, next) => {
  * GET /account
  * Profile page.
  */
-exports.getAccount = (req, res) => {
+exports.getCurrentUserAccount = (req, res) => {
+  // console.log(res.locals.user.admin);
   res.render('account/profile', {
     title: 'Account Management'
+  });
+};
+
+exports.getAllUsers = (req, res) => {
+  if (!res.locals.user.admin) {
+    return res.render('error-forbidden')
+  }
+
+  User.find((err, docs) => {
+    res.render('accounts', { accounts: docs })
+  })
+};
+
+exports.getOtherUserAccount = (req, res) => {
+  if (!res.locals.user.admin) {
+    return res.render('error-forbidden')
+  }
+
+  User.findById(req.params.accountId, (err, user) => {
+    res.render('account/profile', { user: user });
   });
 };
 
@@ -220,6 +251,150 @@ exports.getOauthUnlink = (req, res, next) => {
   });
 };
 
+exports.getInviteUser = (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/');
+  }
+
+  if (!res.locals.user.admin) {
+    return res.render('error-forbidden')
+  }
+
+  res.render('account/invite', {
+    title: 'Invite New User'
+  });
+};
+
+exports.postInviteUser = (req, res, next) => {
+  req.assert('email', 'Please enter a valid email address.').isEmail();
+  req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
+
+  console.log("in the function");
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/invite');
+  }
+
+  let user = new User({
+    username: req.body.username,
+    email: req.body.email
+  });
+
+  console.log("here: creating random token")
+
+  const createRandomToken = randomBytesAsync(16)
+    .then(buf => buf.toString('hex'));
+
+  console.log("setting random token")
+
+  const setRandomToken = token =>
+      user.inviteResetToken = token;
+      user.inviteResetExpires = Date.now() + 14400000;
+      user.inviteSent = true;
+      user = user.save;
+      return user;
+
+  console.log("sending invite email");
+
+  const sendInviteEmail = (user) => {
+    console.log("hi");
+    const token = user.inviteResetToken;
+    let transporter = nodemailer.createTransport({
+      service: 'SendGrid',
+      auth: {
+        user: process.env.SENDGRID_USER,
+        pass: process.env.SENDGRID_PASSWORD
+      }
+    });
+    const mailOptions = {
+      to: user.email,
+      from: 'support@silentchoir.com',
+      subject: 'Invitation to join Silent Choir',
+      text: `You are receiving this email because you have been invited to join Silent Choir.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        http://${req.headers.host}/invite/${token}\n\n
+        If you did not request this, please ignore this email.\n`
+    };
+    return transporter.sendMail(mailOptions)
+      .then(() => {
+        req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+      })
+      .catch((err) => {
+        if (err.message === 'self signed certificate in certificate chain') {
+          console.log('WARNING: Self signed certificate in certificate chain. Retrying with the self signed certificate. Use a valid certificate if in production.');
+          transporter = nodemailer.createTransport({
+            service: 'SendGrid',
+            auth: {
+              user: process.env.SENDGRID_USER,
+              pass: process.env.SENDGRID_PASSWORD
+            },
+            tls: {
+              rejectUnauthorized: false
+            }
+          });
+          return transporter.sendMail(mailOptions)
+            .then(() => {
+              req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+            });
+        }
+        console.log('ERROR: Could not send invitation email after security downgrade.\n', err);
+        req.flash('errors', { msg: 'Error sending the invitation. Please try again shortly.' });
+        return err;
+      });
+    }
+    createRandomToken
+      .then(setRandomToken)
+      .then(sendInviteEmail)
+      .then(() => res.redirect('/invite'))
+      .catch(next);
+  };
+
+exports.getInvite = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return res.redirect('/');
+  }
+  User
+    .findOne({ inviteResetToken: req.params.token })
+    .where('inviteResetExpires').gt(Date.now())
+    .exec((err, user) => {
+      if (err) { return next(err); }
+      if (!user) {
+        req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
+        return res.redirect('/');
+      }
+      res.render('account/signup', {
+        title: 'Set Password'
+      });
+    });
+};
+
+exports.postInvite = (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.redirect('/');
+  }
+  User
+    .findOne({ inviteResetToken: req.params.token })
+    .where('inviteResetExpires').gt(Date.now())
+    .exec((err, user) => {
+      if (err) { return next(err); }
+      if (!user) {
+        req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
+        return res.redirect('/');
+      }
+      user.password = req.body.password;
+      user.save((err) => {
+        if (err) {
+          return next(err);
+        }
+        req.flash('success', { msg: 'Profile created successfully.' });
+        res.redirect('/');
+      })
+    });
+};
+
 /**
  * GET /reset/:token
  * Reset Password page.
@@ -289,8 +464,8 @@ exports.postReset = (req, res, next) => {
     });
     const mailOptions = {
       to: user.email,
-      from: 'hackathon@starter.com',
-      subject: 'Your Hackathon Starter password has been changed',
+      from: 'help@silentchoir.com',
+      subject: 'Your password has been changed',
       text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`
     };
     return transporter.sendMail(mailOptions)
