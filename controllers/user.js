@@ -97,16 +97,9 @@ exports.postSignup = (req, res, next) => {
     return res.redirect('/signup');
   }
 
-  // var expires = new Date();
-  // expires.setHours(expires.getHours() + 6);
-
-  // var seed = crypto.randomBytes(20);
-  // var authToken = crypto.createHash('sha1').update(seed + req.body.email).digest('hex');
-
   const user = new User({
     username: req.body.username,
-    email: req.body.email,
-    password: req.body.password
+    email: req.body.email
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
@@ -117,14 +110,9 @@ exports.postSignup = (req, res, next) => {
     }
     user.save((err) => {
       if (err) { return next(err); }
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        res.redirect('/');
+        res.redirect('/accounts');
       });
     });
-  });
 };
 
 /**
@@ -153,7 +141,7 @@ exports.getOtherUserAccount = (req, res) => {
     return res.render('error-forbidden')
   }
 
-  User.findById(req.params.accountId, (err, user) => {
+  User.findById(req.params.id, (err, user) => {
     res.render('account/profile', { user: user });
   });
 };
@@ -278,24 +266,33 @@ exports.postInviteUser = (req, res, next) => {
     return res.redirect('/invite');
   }
 
-  let user = new User({
-    username: req.body.username,
-    email: req.body.email
-  });
-
   console.log("here: creating random token")
 
   const createRandomToken = randomBytesAsync(16)
     .then(buf => buf.toString('hex'));
 
+  console.log(createRandomToken);
+
   console.log("setting random token")
 
   const setRandomToken = token =>
-      user.inviteResetToken = token;
-      user.inviteResetExpires = Date.now() + 14400000;
-      user.inviteSent = true;
-      user = user.save;
-      return user;
+    User
+      .findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash('errors', { msg: 'Account with that email address does not exist.' });
+        } else {
+          console.log(token);
+          user.inviteToken = token;
+          user.inviteExpires = Date.now() + 3600000; // 1 hour
+          user.invitationCount = 1;
+          user.inviteCreatedAt = Date.now();
+          user.inviteSentAt = Date.now();
+          user.invited = true;
+          user = user.save();
+        }
+        return user;
+      });
 
   console.log("sending invite email");
 
@@ -320,6 +317,7 @@ exports.postInviteUser = (req, res, next) => {
     };
     return transporter.sendMail(mailOptions)
       .then(() => {
+         console.log(token);
         req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
       })
       .catch((err) => {
@@ -353,31 +351,30 @@ exports.postInviteUser = (req, res, next) => {
   };
 
 exports.getInvite = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
-  }
   User
-    .findOne({ inviteResetToken: req.params.token })
-    .where('inviteResetExpires').gt(Date.now())
+    .findOne({ inviteToken: req.params.token })
+    .where('inviteExpires').gt(Date.now())
     .exec((err, user) => {
-      if (err) { return next(err); }
+      console.log("HELLO 1")
+      if (err) {
+        console.log("HELLO 2")
+        return next(err);
+      }
       if (!user) {
         req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
+        console.log("HELLO 3")
         return res.redirect('/');
       }
-      res.render('account/signup', {
+      res.render('account/reset', {
         title: 'Set Password'
       });
     });
 };
 
 exports.postInvite = (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
-  }
   User
-    .findOne({ inviteResetToken: req.params.token })
-    .where('inviteResetExpires').gt(Date.now())
+    .findOne({ inviteToken: req.params.token })
+    .where('inviteExpires').gt(Date.now())
     .exec((err, user) => {
       if (err) { return next(err); }
       if (!user) {
@@ -390,7 +387,7 @@ exports.postInvite = (req, res) => {
           return next(err);
         }
         req.flash('success', { msg: 'Profile created successfully.' });
-        res.redirect('/');
+        res.redirect('/account');
       })
     });
 };

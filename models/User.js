@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
 
   joined: {
     type: Date,
-    default: Date.now
+    default: null
   },
 
   admin: {
@@ -43,9 +43,31 @@ const userSchema = new mongoose.Schema({
     default: false
   },
 
-  inviteResetToken: String,
-  inviteResetExpires: Date,
-  inviteSent: {
+  inviteToken: {
+    type: String,
+    default: null
+  },
+  inviteCreatedAt: {
+    type: Date,
+    default: null
+  },
+  inviteSentAt: {
+    type: Date,
+    default: null
+  },
+  inviteAcceptedAt: {
+    type: Date,
+    default: null,
+  },
+  invitationCount: {
+    type: Number,
+    default: null
+  },
+  inviteExpires: {
+    type: Date,
+    default: null
+  },
+  invited: {
     type: Boolean,
     default: false
   },

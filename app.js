@@ -168,7 +168,7 @@ app.post('/account/password', passportConfig.isAuthenticated, userController.pos
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/accounts', passportConfig.isAuthenticated, userController.getAllUsers);
-app.get('/account/:accountId', passportConfig.isAuthenticated, userController.getOtherUserAccount);
+app.get('/account/:id', passportConfig.isAuthenticated, userController.getOtherUserAccount);
 app.get('/invite', passportConfig.isAuthenticated, userController.getInviteUser);
 app.post('/invite', passportConfig.isAuthenticated, userController.postInviteUser);
 app.get('/invite/:token', userController.getInvite);
