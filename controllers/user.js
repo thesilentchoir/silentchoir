@@ -63,24 +63,24 @@ exports.logout = (req, res) => {
 };
 
 /**
- * GET /signup
+ * GET /account/create
  * Signup page.
  */
-exports.getSignup = (req, res) => {
+exports.getCreateAccount = (req, res) => {
   if (!res.locals.user.admin) {
     return res.render('error-forbidden')
   }
 
-  res.render('account/signup', {
+  res.render('account/create', {
     title: 'Create Account'
   });
 };
 
 /**
- * POST /signup
+ * POST /account/create
  * Create a new local account.
  */
-exports.postSignup = (req, res, next) => {
+exports.postCreateAccount = (req, res, next) => {
   if (!res.locals.user.admin) {
     return res.render('error-forbidden')
   }
@@ -94,7 +94,7 @@ exports.postSignup = (req, res, next) => {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/signup');
+    return res.redirect('/acccount/create');
   }
 
   const user = new User({
@@ -106,13 +106,13 @@ exports.postSignup = (req, res, next) => {
     if (err) { return next(err); }
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/signup');
+      return res.redirect('/account/create');
     }
     user.save((err) => {
       if (err) { return next(err); }
         res.redirect('/accounts');
-      });
     });
+  });
 };
 
 /**
@@ -120,7 +120,6 @@ exports.postSignup = (req, res, next) => {
  * Profile page.
  */
 exports.getCurrentUserAccount = (req, res) => {
-  // console.log(res.locals.user.admin);
   res.render('account/profile', {
     title: 'Account Management'
   });
@@ -141,7 +140,7 @@ exports.getOtherUserAccount = (req, res) => {
     return res.render('error-forbidden')
   }
 
-  User.findById(req.params.id, (err, user) => {
+  User.findById(req.params.accountId, (err, user) => {
     res.render('account/profile', { user: user });
   });
 };
@@ -257,8 +256,6 @@ exports.postInviteUser = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
 
-  console.log("in the function");
-
   const errors = req.validationErrors();
 
   if (errors) {
@@ -266,14 +263,8 @@ exports.postInviteUser = (req, res, next) => {
     return res.redirect('/invite');
   }
 
-  console.log("here: creating random token")
-
   const createRandomToken = randomBytesAsync(16)
     .then(buf => buf.toString('hex'));
-
-  console.log(createRandomToken);
-
-  console.log("setting random token")
 
   const setRandomToken = token =>
     User
@@ -285,7 +276,7 @@ exports.postInviteUser = (req, res, next) => {
           console.log(token);
           user.inviteToken = token;
           user.inviteExpires = Date.now() + 3600000; // 1 hour
-          user.invitationCount = 1;
+          user.invitationCount = user.invitationCount + 1;
           user.inviteCreatedAt = Date.now();
           user.inviteSentAt = Date.now();
           user.invited = true;
@@ -294,10 +285,7 @@ exports.postInviteUser = (req, res, next) => {
         return user;
       });
 
-  console.log("sending invite email");
-
   const sendInviteEmail = (user) => {
-    console.log("hi");
     const token = user.inviteResetToken;
     let transporter = nodemailer.createTransport({
       service: 'SendGrid',
@@ -346,29 +334,30 @@ exports.postInviteUser = (req, res, next) => {
     createRandomToken
       .then(setRandomToken)
       .then(sendInviteEmail)
-      .then(() => res.redirect('/invite'))
+      .then(() => res.redirect(req.headers.referer))
       .catch(next);
   };
 
 exports.getInvite = (req, res, next) => {
+  if (!(res.locals.user === undefined)) {
+    return res.render('error-forbidden')
+  }
+
   User
     .findOne({ inviteToken: req.params.token })
     .where('inviteExpires').gt(Date.now())
     .exec((err, user) => {
-      console.log("HELLO 1")
       if (err) {
-        console.log("HELLO 2")
         return next(err);
       }
       if (!user) {
         req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
-        console.log("HELLO 3")
         return res.redirect('/');
       }
       res.render('account/reset', {
         title: 'Set Password'
       });
-    });
+  });
 };
 
 exports.postInvite = (req, res) => {
@@ -382,14 +371,20 @@ exports.postInvite = (req, res) => {
         return res.redirect('/');
       }
       user.password = req.body.password;
+      user.joined = true;
+      user.inviteAcceptedAt = Date.now();
       user.save((err) => {
         if (err) {
           return next(err);
         }
         req.flash('success', { msg: 'Profile created successfully.' });
-        res.redirect('/account');
-      })
-    });
+        req.logIn(user, (err) => {
+          if (err) { return next(err); }
+          req.flash('success', { msg: 'Success! You are logged in.' });
+          res.redirect('/account');
+        });
+      });
+  });
 };
 
 /**

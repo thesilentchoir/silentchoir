@@ -158,8 +158,8 @@ app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
 app.post('/reset/:token', userController.postReset);
-app.get('/signup', passportConfig.isAuthenticated, userController.getSignup);
-app.post('/signup', passportConfig.isAuthenticated, userController.postSignup);
+app.get('/accounts/create', passportConfig.isAuthenticated, userController.getCreateAccount);
+app.post('/accounts/create', passportConfig.isAuthenticated, userController.postCreateAccount);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
 app.get('/account', passportConfig.isAuthenticated, userController.getCurrentUserAccount);
@@ -168,15 +168,11 @@ app.post('/account/password', passportConfig.isAuthenticated, userController.pos
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/accounts', passportConfig.isAuthenticated, userController.getAllUsers);
-app.get('/account/:id', passportConfig.isAuthenticated, userController.getOtherUserAccount);
+app.get('/accounts/:accountId', passportConfig.isAuthenticated, userController.getOtherUserAccount);
 app.get('/invite', passportConfig.isAuthenticated, userController.getInviteUser);
 app.post('/invite', passportConfig.isAuthenticated, userController.postInviteUser);
 app.get('/invite/:token', userController.getInvite);
 app.post('/invite/:token', userController.postInvite);
-
-// need route for sending email
-// route getAccountReset
-// route postAccountReset
 
 /**
  * Report routes
@@ -187,7 +183,6 @@ app.get('/reports/:reportId', passportConfig.isAuthenticated, reportController.s
 app.get('/reports/:reportId', passportConfig.isAuthenticated, reportController.getUpdateReport)
 app.put('/reports/:reportId', passportConfig.isAuthenticated, reportController.putUpdateReport)
 app.delete('/reports/:reportId', passportConfig.isAuthenticated, reportController.deleteReport)
-
 
 /**
  * Room routes

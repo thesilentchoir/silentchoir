@@ -4,16 +4,6 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String
-    // required: true,
-  },
-
-  lastName: {
-    type: String
-    // required: true,
-  },
-
   username: {
     type: String,
     // required: true,
@@ -34,15 +24,13 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 
   joined: {
-    type: Date,
-    default: null
+    type: Boolean,
+    default: false
   },
-
   admin: {
     type: Boolean,
     default: false
   },
-
   inviteToken: {
     type: String,
     default: null
@@ -61,7 +49,7 @@ const userSchema = new mongoose.Schema({
   },
   invitationCount: {
     type: Number,
-    default: null
+    default: 0
   },
   inviteExpires: {
     type: Date,
@@ -71,11 +59,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-
-  // resetToken: {
-  //   token: String,
-  //   expires: Date
-  // },
 
   facebook: String,
   twitter: String,
