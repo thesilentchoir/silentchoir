@@ -162,17 +162,20 @@ app.get('/accounts/create', passportConfig.isAuthenticated, userController.getCr
 app.post('/accounts/create', passportConfig.isAuthenticated, userController.postCreateAccount);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
-app.get('/account', passportConfig.isAuthenticated, userController.getCurrentUserAccount);
-app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
+// app.get('/account/:accountId', passportConfig.isAuthenticated, userController.getUserAccount);
+app.post('/accounts/:accountId/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
+app.post('/accounts/:accountId/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
+app.post('/accounts/:accountId/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/accounts', passportConfig.isAuthenticated, userController.getAllUsers);
-app.get('/accounts/:accountId', passportConfig.isAuthenticated, userController.getOtherUserAccount);
+app.get('/accounts/:accountId', passportConfig.isAuthenticated, userController.getUserAccount);
 app.get('/invite', passportConfig.isAuthenticated, userController.getInviteUser);
-app.post('/invite', passportConfig.isAuthenticated, userController.postInviteUser);
+app.post('/accounts/:accountId/invite', passportConfig.isAuthenticated, userController.postInviteUser);
 app.get('/invite/:token', userController.getInvite);
 app.post('/invite/:token', userController.postInvite);
+app.post('/accounts/:accountId/admin', passportConfig.isAuthenticated, userController.postMakeAdmin)
+app.post('/accounts/:accountId/revoke', passportConfig.isAuthenticated, userController.postRevokeAdmin)
+
 
 /**
  * Report routes

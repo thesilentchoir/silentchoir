@@ -30,6 +30,8 @@ exports.postLogin = (req, res, next) => {
 
   const errors = req.validationErrors();
 
+  console.log(errors);
+
   if (errors) {
     req.flash('errors', errors);
     return res.redirect('/login');
@@ -44,7 +46,8 @@ exports.postLogin = (req, res, next) => {
     req.logIn(user, (err) => {
       if (err) { return next(err); }
       req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      const redirectAfterLogin = '/accounts/' + req.user._id
+      res.redirect( redirectAfterLogin || '/');
     });
   })(req, res, next);
 };
@@ -64,7 +67,7 @@ exports.logout = (req, res) => {
 
 /**
  * GET /account/create
- * Signup page.
+ * Page to create a user --> Only available to admins
  */
 exports.getCreateAccount = (req, res) => {
   if (!res.locals.user.admin) {
@@ -116,15 +119,9 @@ exports.postCreateAccount = (req, res, next) => {
 };
 
 /**
- * GET /account
- * Profile page.
+ * GET /accounts
+ * A list of current user accounts -- only available to admins
  */
-exports.getCurrentUserAccount = (req, res) => {
-  res.render('account/profile', {
-    title: 'Account Management'
-  });
-};
-
 exports.getAllUsers = (req, res) => {
   if (!res.locals.user.admin) {
     return res.render('error-forbidden')
@@ -135,13 +132,24 @@ exports.getAllUsers = (req, res) => {
   })
 };
 
-exports.getOtherUserAccount = (req, res) => {
+/**
+ * GET /accounts/:accountId
+ * Gets user accounts -- admins can navigate to any user page, non-admins can only view their own pages
+ */
+exports.getUserAccount = (req, res) => {
   if (!res.locals.user.admin) {
-    return res.render('error-forbidden')
+    if (req.user._id !== req.params.accountId) {
+      return res.render('error-forbidden')
+    }
   }
 
   User.findById(req.params.accountId, (err, user) => {
-    res.render('account/profile', { user: user });
+    const inviteActionRoute = "/accounts/" + req.params.accountId + "/invite"
+    const adminGrantActionRoute = "/accounts/" + req.params.accountId + "/admin"
+    const adminRevokeActionRoute = "/accounts/" + req.params.accountId + "/revoke"
+    const deleteActionRoute = "/accounts/" + req.params.accountId + "/delete"
+    const updatePasswordRoute = "/accounts/" + req.params.accountId + "/password"
+    res.render('account/profile', { user: user, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
   });
 };
 
@@ -182,7 +190,7 @@ exports.postUpdateProfile = (req, res, next) => {
 };
 
 /**
- * POST /account/password
+ * POST /accounts/:accountId/password
  * Update current password.
  */
 exports.postUpdatePassword = (req, res, next) => {
@@ -202,21 +210,72 @@ exports.postUpdatePassword = (req, res, next) => {
     user.save((err) => {
       if (err) { return next(err); }
       req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
+      res.redirect(req.headers.referer);
     });
   });
 };
 
 /**
- * POST /account/delete
- * Delete user account.
+ * POST /accounts/:accountId/delete
+ * Delete user account
+ * if originating user's account -- allow
+ * if not originating user's account -- check if admin, allow; if not admin, forbidden
  */
 exports.postDeleteAccount = (req, res, next) => {
-  User.deleteOne({ _id: req.user.id }, (err) => {
+  if (req.user._id === req.params.accountId) {
+    User.deleteOne({ _id: req.params.accountId }, (err) => {
+      if (err) { return next(err); }
+      if (req.params.accountId === req.user._id) {
+        req.logout();
+        req.flash('info', { msg: 'Your account has been deleted.' });
+        res.redirect('/');
+      } else {
+        req.flash('info', { msg: 'Account has been deleted.' });
+        res.redirect('/accounts');
+      }
+    });
+  } else if (req.user.admin === true) {
+    User.deleteOne({ _id: req.params.accountId }, (err) => {
+      if (err) { return next(err); }
+      if (req.params.accountId === req.user._id) {
+        req.logout();
+        req.flash('info', { msg: 'Your account has been deleted.' });
+        res.redirect('/');
+      } else {
+        req.flash('info', { msg: 'Account has been deleted.' });
+        res.redirect('/accounts');
+      }
+    });
+  } else {
+    return res.render('error-forbidden')
+  }
+};
+
+/**
+ * POST /account/admin
+ * Make user account an admin.
+ */
+exports.postMakeAdmin = (req, res, next) => {
+  User.findById({ _id: req.params.accountId }, (err, user) => {
     if (err) { return next(err); }
-    req.logout();
-    req.flash('info', { msg: 'Your account has been deleted.' });
-    res.redirect('/');
+    user.admin = true;
+    user.save((err) => {
+      if (err) { return next(err); }
+      req.flash('info', { msg: 'Account has been granted admin rights' });
+      res.redirect(req.headers.referer);
+    })
+  });
+};
+
+exports.postRevokeAdmin = (req, res, next) => {
+  User.findById({ _id: req.params.accountId }, (err, user) => {
+    if (err) { return next(err); }
+    user.admin = false;
+    user.save((err) => {
+      if (err) { return next(err); }
+      req.flash('info', { msg: 'Admin rights have been revoked for this account' });
+      res.redirect(req.headers.referer);
+    })
   });
 };
 
@@ -253,8 +312,8 @@ exports.getInviteUser = (req, res) => {
 };
 
 exports.postInviteUser = (req, res, next) => {
-  req.assert('email', 'Please enter a valid email address.').isEmail();
-  req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
+  // req.assert('email', 'Please enter a valid email address.').isEmail();
+  // req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
 
@@ -268,7 +327,7 @@ exports.postInviteUser = (req, res, next) => {
 
   const setRandomToken = token =>
     User
-      .findOne({ email: req.body.email })
+      .findById({ _id: req.params.accountId })
       .then((user) => {
         if (!user) {
           req.flash('errors', { msg: 'Account with that email address does not exist.' });
@@ -282,6 +341,7 @@ exports.postInviteUser = (req, res, next) => {
           user.invited = true;
           user = user.save();
         }
+        console.log(user);
         return user;
       });
 
