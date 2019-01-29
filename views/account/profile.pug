@@ -2,26 +2,13 @@ extends ../layout
 
 block content
   .pb-2.mt-2.mb-4.border-bottom
-    h3 Profile Information
-
-  form(action='/invite', method='POST')
-    input(type='hidden', name='_csrf', value=_csrf)
-    .form-group.row
-      label.col-md-3.col-form-label.font-weight-bold.text-right(for='email') Email
-      .col-md-7
-        input.form-control(type='email', name='email', id='email', value=user.email, autocomplete='email')
-    .form-group
-      .offset-sm-3.col-md-7.pl-2
-        button.btn.btn.btn-primary(type='submit')
-          i.fas.fa-pencil-alt.fa-sm
-          | Invite
-
+    h3 Update Profile Information
 
 
   .pb-2.mt-2.mb-4.border-bottom
     h3 Change Password
 
-  form(action='/account/password', method='POST')
+  form(action=updatePasswordAction, method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group.row
       label.col-md-3.col-form-label.font-weight-bold.text-right(for='password') New Password
@@ -38,13 +25,51 @@ block content
           | Change Password
 
   .pb-2.mt-2.mb-4.border-bottom
-    h3 Delete Account
+    h3 Manage Account
 
-  form(action='/account/delete', method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
+  if referringUser.admin === true
+    form(action=action, method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        if user.invited === true
+          p.offset-sm-3.col-md-7.pl-2 This user has been invited. You can resend the invitation, if needed.
+          .offset-sm-3.col-md-7.pl-2
+            button.btn.btn.btn-primary(type='submit')
+              i.fas.fa-pencil-alt.fa-sm
+              | Re-Invite
+        else
+          .offset-sm-3.col-md-7.pl-2
+            button.btn.btn.btn-primary(type='submit')
+              i.fas.fa-pencil-alt.fa-sm
+              | Re-Invite
+        end
+    if user.admin === false
+
+      form(action=adminGrantAction, method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+        p.offset-sm-3.col-md-7.pl-2 This user is not an admin.
+          .offset-sm-3.col-md-7.pl-2
+            button.btn.btn.btn-primary(type='submit')
+              i.fas.fa-pencil-alt.fa-sm
+              | Make Admin
+    else
+
+      form(action=adminRevokeAction, method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+        p.offset-sm-3.col-md-7.pl-2 This user is an admin.
+          .offset-sm-3.col-md-7.pl-2
+            button.btn.btn.btn-primary(type='submit')
+              i.fas.fa-pencil-alt.fa-sm
+              | Revoke Admin
+    end
+
+  form(action=deleteAction, method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
     .form-group
-      p.offset-sm-3.col-md-7.pl-2 You can delete your account, but keep in mind this action is irreversible.
+      p.offset-sm-3.col-md-7.pl-2 Delete this account, but keep in mind this action is irreversible.
       input(type='hidden', name='_csrf', value=_csrf)
       .offset-sm-3.col-md-7.pl-2
         button.btn.btn-danger(type='submit')
           i.fas.fa-trash-alt.fa-sm
-          | Delete my account
+          | Delete account
