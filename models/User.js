@@ -2,11 +2,12 @@ const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
+const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    // required: true,
+    required: true,
     lowercase: true,
     unique: true,
     match: /^[\w][\w\-\.]*[\w]$/i
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
 
   email: {
     type: String,
-    // required: true,
+    required: true,
     unique: true,
     lowercase: true
   },
@@ -95,9 +96,7 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
   });
 };
 
-/**
- * Helper method for getting user's gravatar.
- */
+userSchema.plugin(uniqueValidator);
 
 const User = mongoose.model('User', userSchema);
 

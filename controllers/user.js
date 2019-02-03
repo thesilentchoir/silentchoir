@@ -89,6 +89,7 @@ exports.postCreateAccount = (req, res, next) => {
   }
 
   req.assert('email', 'Email is not valid').isEmail();
+  // req.assert('username', 'Username is not valid').isUsername();
   // req.assert('password', 'Password must be at least 20 characters long').len(20);
   // req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
@@ -109,10 +110,15 @@ exports.postCreateAccount = (req, res, next) => {
     if (err) { return next(err); }
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/account/create');
+      return res.redirect('/accounts/create');
     }
     user.save((err) => {
-      if (err) { return next(err); }
+      if (err.name === "ValidationError") {
+        req.flash('errors', { msg: 'Account with that username already exists.' });
+        return res.redirect('/accounts/create');
+      } else if (err) {
+        return next(err);
+      }
         res.redirect('/accounts');
     });
   });
