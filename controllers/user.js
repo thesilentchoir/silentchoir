@@ -89,9 +89,7 @@ exports.postCreateAccount = (req, res, next) => {
   }
 
   req.assert('email', 'Email is not valid').isEmail();
-  // req.assert('username', 'Username is not valid').isUsername();
-  // req.assert('password', 'Password must be at least 20 characters long').len(20);
-  // req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+  req.assert('username', 'Username is not valid').isUsername();
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
@@ -155,7 +153,8 @@ exports.getUserAccount = (req, res) => {
     const adminRevokeActionRoute = "/accounts/" + req.params.accountId + "/revoke"
     const deleteActionRoute = "/accounts/" + req.params.accountId + "/delete"
     const updatePasswordRoute = "/accounts/" + req.params.accountId + "/password"
-    res.render('account/profile', { user: user, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
+    const updateProfileRoute = "/accounts/" + req.params.accountId + "/profile"
+    res.render("account/profile", { user: user, updateProfileAction: updateProfileRoute, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
   });
 };
 
@@ -171,26 +170,24 @@ exports.postUpdateProfile = (req, res, next) => {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/account');
+    return res.redirect(req.headers.referer);
   }
 
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.params.accountId, (err, user) => {
+    console.log("HERE")
     if (err) { return next(err); }
     user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
-    user.profile.gender = req.body.gender || '';
-    user.profile.location = req.body.location || '';
-    user.profile.website = req.body.website || '';
+    user.username = req.body.username || '';
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
           req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
-          return res.redirect('/account');
+          return res.redirect(req.headers.referer);
         }
         return next(err);
       }
       req.flash('success', { msg: 'Profile information has been updated.' });
-      res.redirect('/account');
+      res.redirect(req.headers.referer);
     });
   });
 };
@@ -318,9 +315,6 @@ exports.getInviteUser = (req, res) => {
 };
 
 exports.postInviteUser = (req, res, next) => {
-  // req.assert('email', 'Please enter a valid email address.').isEmail();
-  // req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
-
   const errors = req.validationErrors();
 
   if (errors) {
@@ -427,6 +421,9 @@ exports.getInvite = (req, res, next) => {
 };
 
 exports.postInvite = (req, res) => {
+  req.assert('password', 'Password must be at least 14 characters long').len(14);
+  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+
   User
     .findOne({ inviteToken: req.params.token })
     .where('inviteExpires').gt(Date.now())

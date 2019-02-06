@@ -4,6 +4,22 @@ block content
   .pb-2.mt-2.mb-4.border-bottom
     h3 Update Profile Information
 
+  form(action=updateProfileAction, method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      label.col-md-3.col-form-label.font-weight-bold.text-right(for='email') Email
+      .col-md-7
+        input.form-control(type='email', name='email', id='email', value=user.email, autocomplete='email')
+    .form-group.row
+      label.col-md-3.col-form-label.font-weight-bold.text-right(for='username') Confirm Password
+      .col-md-7
+        input.form-control(type='username', name='username', id='username', value=user.username autocomplete='username')
+    .form-group
+      .offset-sm-3.col-md-7.pl-2
+        button.btn.btn-primary(type='submit')
+          i.fas.fa-lock.fa-sm
+          | Update
+
 
   .pb-2.mt-2.mb-4.border-bottom
     h3 Change Password

@@ -162,10 +162,9 @@ app.get('/accounts/create', passportConfig.isAuthenticated, userController.getCr
 app.post('/accounts/create', passportConfig.isAuthenticated, userController.postCreateAccount);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
-// app.get('/account/:accountId', passportConfig.isAuthenticated, userController.getUserAccount);
 app.post('/accounts/:accountId/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post('/accounts/:accountId/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/accounts/:accountId/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
+app.post('/accounts/:accountId/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/accounts', passportConfig.isAuthenticated, userController.getAllUsers);
 app.get('/accounts/:accountId', passportConfig.isAuthenticated, userController.getUserAccount);
