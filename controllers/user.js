@@ -75,7 +75,8 @@ exports.getCreateAccount = (req, res) => {
   }
 
   res.render('account/create', {
-    title: 'Create Account'
+    title: 'Create Account',
+    referringUser: req.user
   });
 };
 
@@ -132,7 +133,7 @@ exports.getAllUsers = (req, res) => {
   }
 
   User.find((err, docs) => {
-    res.render('accounts', { accounts: docs })
+    res.render('accounts', { accounts: docs, referringUser: req.user })
   })
 };
 
@@ -154,7 +155,8 @@ exports.getUserAccount = (req, res) => {
     const deleteActionRoute = "/accounts/" + req.params.accountId + "/delete"
     const updatePasswordRoute = "/accounts/" + req.params.accountId + "/password"
     const updateProfileRoute = "/accounts/" + req.params.accountId + "/profile"
-    res.render("account/profile", { user: user, updateProfileAction: updateProfileRoute, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
+    const referringUserRoute = "/accounts/" + req.user._id
+    res.render("account/profile", { user: user, referringUserRoute: referringUserRoute, updateProfileAction: updateProfileRoute, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
   });
 };
 
@@ -207,7 +209,7 @@ exports.postUpdatePassword = (req, res, next) => {
     return res.redirect('/account');
   }
 
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.params.accountId, (err, user) => {
     if (err) { return next(err); }
     user.password = req.body.password;
     user.save((err) => {
@@ -279,24 +281,6 @@ exports.postRevokeAdmin = (req, res, next) => {
       req.flash('info', { msg: 'Admin rights have been revoked for this account' });
       res.redirect(req.headers.referer);
     })
-  });
-};
-
-/**
- * GET /account/unlink/:provider
- * Unlink OAuth provider.
- */
-exports.getOauthUnlink = (req, res, next) => {
-  const { provider } = req.params;
-  User.findById(req.user.id, (err, user) => {
-    if (err) { return next(err); }
-    user[provider] = undefined;
-    user.tokens = user.tokens.filter(token => token.kind !== provider);
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.flash('info', { msg: `${provider} account has been unlinked.` });
-      res.redirect('/account');
-    });
   });
 };
 
