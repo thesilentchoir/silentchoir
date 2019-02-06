@@ -60,13 +60,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-
-  facebook: String,
-  twitter: String,
-  google: String,
-  github: String,
-  instagram: String,
-  linkedin: String,
+  
   steam: String,
   tokens: Array
 }, { timestamps: true });
