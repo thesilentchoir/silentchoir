@@ -9,9 +9,15 @@ html
     title #{title} - Hackathon Starter
     link(rel='shortcut icon', href='/favicon.png')
     link(rel='stylesheet', href='/css/main.css')
+    script(src='http://localhost:8080/socket.io/socket.io.js')
+    script.
+      let socket = io('http://localhost:8080');
+      socket.on('news', function (data) {
+        console.log(data);
+        socket.emit('my other event', { my: 'data' });
+      });
 
   body
-    include partials/header
 
     .container
       include partials/flash

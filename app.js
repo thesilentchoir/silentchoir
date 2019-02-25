@@ -46,7 +46,9 @@ const passportConfig = require('./config/passport');
 /**
  * Create Express server.
  */
-const app = express();
+ const app = express();
+ const server = require('http').Server(app);
+ const io = require('socket.io')(server);
 
 /**
  * Connect to MongoDB.
@@ -67,7 +69,8 @@ mongoose.connection.on('error', (err) => {
 app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(expressStatusMonitor());
+app.use(expressStatusMonitor({ websocket: io, port: app.get('port') }));
+
 app.use(compression());
 app.use(sass({
   src: path.join(__dirname, 'public'),
@@ -195,10 +198,13 @@ app.delete('/rooms/:roomId', passportConfig.isAuthenticated, roomController.dele
 /**
  * Messages routes
  */
-app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.getNewMessage)
-app.post('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.createMessage)
-app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.listMessages)
-app.get('/rooms/:roomId/messages/:messageId', passportConfig.isAuthenticated, messageController.deleteMessage)
+// app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.getNewMessage)
+// app.post('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.createMessage)
+// app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.listMessages)
+// app.get('/rooms/:roomId/messages/:messageId', passportConfig.isAuthenticated, messageController.deleteMessage)
+
+app.get('/messages', messageController.getMessages)
+app.post('/messages', messageController.postMessages)
 
 /**
  * API examples routes.
@@ -221,9 +227,16 @@ if (process.env.NODE_ENV === 'development') {
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), () => {
+server.listen(app.get('port'), () => {
   console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
   console.log('  Press CTRL-C to stop\n');
+});
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
 });
 
 module.exports = app;
