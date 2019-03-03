@@ -4,6 +4,13 @@ block content
   .page-header
     h3 Messages
 
-  ul
-    for message in messages
-      li= message
+  body
+    div.container#main
+      div.row
+        input(type='text', class='form-control', placeholder='Username')#username
+        div.btn-group
+          button.btn-success#send_username Change Username
+        input(type='text', class='form-control', placeholder='Your Message Here')#message
+        div.btn-group
+          button.btn-success#send_message Send
+      div#chatroom

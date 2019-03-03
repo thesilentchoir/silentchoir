@@ -233,10 +233,15 @@ server.listen(app.get('port'), () => {
 });
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+  console.log('New user connected');
+  socket.username = "Anonymous";
+  socket.on('change_username', (data) => {
+    socket.username = data.username;
+  })
+
+  socket.on('new_message', (data) => {
+    io.sockets.emit('new_message', { message : data.message, username : socket.username })
+  })
 });
 
 module.exports = app;

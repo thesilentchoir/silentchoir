@@ -12,14 +12,12 @@ const messageSchema = new mongoose.Schema({
     //     ref: 'User'
     //     // required: true
     // },
-    text: {
+    name: {
         type: String
         // required: true
     },
-    posted: {
-        type: Date,
-        default: Date.now,
-        index: true
+    message: {
+        type: String
     }
 });
 
