@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Room = require('../models/Room');
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
@@ -128,9 +129,9 @@ exports.postCreateAccount = (req, res, next) => {
  * A list of current user accounts -- only available to admins
  */
 exports.getAllUsers = (req, res) => {
-  if (!res.locals.user.admin) {
-    return res.render('error-forbidden')
-  }
+  // if (!res.locals.user.admin) {
+  //   return res.render('error-forbidden')
+  // }
 
   User.find((err, docs) => {
     res.render('accounts', { accounts: docs, referringUser: req.user })
@@ -142,10 +143,8 @@ exports.getAllUsers = (req, res) => {
  * Gets user accounts -- admins can navigate to any user page, non-admins can only view their own pages
  */
 exports.getUserAccount = (req, res) => {
-  if (!res.locals.user.admin) {
-    if (req.user._id !== req.params.accountId) {
-      return res.render('error-forbidden')
-    }
+  if ((!res.locals.user.admin) && (req.user.id !== req.params.accountId)) {
+    return res.render('error-forbidden')
   }
 
   User.findById(req.params.accountId, (err, user) => {
@@ -156,7 +155,11 @@ exports.getUserAccount = (req, res) => {
     const updatePasswordRoute = "/accounts/" + req.params.accountId + "/password"
     const updateProfileRoute = "/accounts/" + req.params.accountId + "/profile"
     const referringUserRoute = "/accounts/" + req.user._id
-    res.render("account/profile", { user: user, referringUserRoute: referringUserRoute, updateProfileAction: updateProfileRoute, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, referringUser: req.user });
+    const addToRoomRoute = "/accounts/" + req.params.accountId + "/add-to-room"
+
+    Room.find((err, docs) => {
+      res.render("account/profile", { user: user, referringUserRoute: referringUserRoute, updateProfileAction: updateProfileRoute, inviteAction: inviteActionRoute, adminGrantAction: adminGrantActionRoute, adminRevokeAction: adminRevokeActionRoute, updatePasswordAction: updatePasswordRoute, deleteAction: deleteActionRoute, addToRoom: addToRoomRoute, referringUser: req.user, rooms: docs });
+    });
   });
 };
 
@@ -283,6 +286,62 @@ exports.postRevokeAdmin = (req, res, next) => {
     })
   });
 };
+
+exports.postAddToRoom = (req, res, next) => {
+  User.findById({ _id: req.params.accountId }, (err, user) => {
+    if (err) { return next(err); }
+
+    Room
+      .findById({ _id: req.body.room })
+      .exec((err, room) => {
+        if (err) { return next(err); }
+        if (!room) {
+          req.flash('errors', { msg: 'There was an error finding the room.' });
+          return res.redirect(req.headers.referer);
+        }
+
+        console.log("HERE participantsObject")
+        let participantsObject = room.participants;
+        let participantStringsArray = participantsObject.map(id => JSON.stringify(id));
+
+        console.log("HERE idCheck")
+        let idCheck = JSON.stringify(req.params.accountId);
+
+        if (!participantStringsArray.includes(idCheck)) {
+          console.log("HERE room participants")
+          room.participants.push(user);
+          room.save();
+
+          req.flash('success', { msg: 'User added as a participant.' });
+          return res.redirect(req.headers.referer);
+        } else {
+          req.flash('errors', { msg: 'This user is already a participant in this room.' });
+          return res.redirect(req.headers.referer);
+        };
+      });
+    });
+  }
+
+// .exec((err, user) => {
+//   if (err) { return next(err); }
+//   if (!user) {
+//     req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
+//     return res.redirect('/');
+//   }
+//   user.password = req.body.password;
+//   user.joined = true;
+//   user.inviteAcceptedAt = Date.now();
+//   user.save((err) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     req.flash('success', { msg: 'Profile created successfully.' });
+//     req.logIn(user, (err) => {
+//       if (err) { return next(err); }
+//       req.flash('success', { msg: 'Success! You are logged in.' });
+//       res.redirect('/account');
+//     });
+//   });
 
 exports.getInviteUser = (req, res) => {
   if (!req.isAuthenticated()) {

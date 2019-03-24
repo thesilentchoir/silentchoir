@@ -24,27 +24,42 @@ block content
   .pb-2.mt-2.mb-4.border-bottom
     h3 Change Password
 
-    form(action=updatePasswordAction, method='POST')
-      input(type='hidden', name='_csrf', value=_csrf)
-      .form-group.row
-        label.col-md-3.col-form-label.font-weight-bold.text-right(for='password') New Password
-        .col-md-7
-          input.form-control(type='password', name='password', id='password', autocomplete='new-password')
-      .form-group.row
-        label.col-md-3.col-form-label.font-weight-bold.text-right(for='confirmPassword') Confirm Password
-        .col-md-7
-          input.form-control(type='password', name='confirmPassword', id='confirmPassword', autocomplete='new-password')
-      .form-group
-        .offset-sm-3.col-md-7.pl-2
-          button.btn.btn-primary(type='submit')
-            i.fas.fa-lock.fa-sm
-            | Change Password
+  form(action=updatePasswordAction, method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      label.col-md-3.col-form-label.font-weight-bold.text-right(for='password') New Password
+      .col-md-7
+        input.form-control(type='password', name='password', id='password', autocomplete='new-password')
+    .form-group.row
+      label.col-md-3.col-form-label.font-weight-bold.text-right(for='confirmPassword') Confirm Password
+      .col-md-7
+        input.form-control(type='password', name='confirmPassword', id='confirmPassword', autocomplete='new-password')
+    .form-group
+      .offset-sm-3.col-md-7.pl-2
+        button.btn.btn-primary(type='submit')
+          i.fas.fa-lock.fa-sm
+          | Change Password
 
   .pb-2.mt-2.mb-4.border-bottom
     h3 Manage Account
 
   if referringUser.admin === true
-    form(action=action, method='POST')
+
+      form(action=addToRoom, method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group.row
+          label.col-md-3.col-form-label.font-weight-bold.text-right(for='room') Add to room
+          .col-md-7
+            select.form-control(type='room', name='room', id='room')
+              each room in rooms
+                option(value=room.id, selected=(room.alleged_party)) #{room.alleged_party}
+        .form-group
+          .offset-sm-3.col-md-7.pl-2
+            button.btn.btn.btn-primary(type='submit')
+              i.fas.fa-pencil-alt.fa-sm
+              | Add
+
+      form(action=action, method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
       .form-group
         if user.invited === true
@@ -59,27 +74,28 @@ block content
               i.fas.fa-pencil-alt.fa-sm
               | Re-Invite
         end
-    if user.admin === false
 
-      form(action=adminGrantAction, method='POST')
-        input(type='hidden', name='_csrf', value=_csrf)
-        .form-group
-        p.offset-sm-3.col-md-7.pl-2 This user is not an admin.
-          .offset-sm-3.col-md-7.pl-2
-            button.btn.btn.btn-primary(type='submit')
-              i.fas.fa-pencil-alt.fa-sm
-              | Make Admin
-    else
+        if user.admin === false
 
-      form(action=adminRevokeAction, method='POST')
-        input(type='hidden', name='_csrf', value=_csrf)
-        .form-group
-        p.offset-sm-3.col-md-7.pl-2 This user is an admin.
-          .offset-sm-3.col-md-7.pl-2
-            button.btn.btn.btn-primary(type='submit')
-              i.fas.fa-pencil-alt.fa-sm
-              | Revoke Admin
-    end
+          form(action=adminGrantAction, method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group
+            p.offset-sm-3.col-md-7.pl-2 This user is not an admin.
+              .offset-sm-3.col-md-7.pl-2
+                button.btn.btn.btn-primary(type='submit')
+                  i.fas.fa-pencil-alt.fa-sm
+                  | Make Admin
+        else
+
+          form(action=adminRevokeAction, method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group
+            p.offset-sm-3.col-md-7.pl-2 This user is an admin.
+              .offset-sm-3.col-md-7.pl-2
+                button.btn.btn.btn-primary(type='submit')
+                  i.fas.fa-pencil-alt.fa-sm
+                  | Revoke Admin
+        end
 
   form(action=deleteAction, method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
     .form-group
