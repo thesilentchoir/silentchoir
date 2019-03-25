@@ -1,3 +1,8 @@
+const Message = require('./models/Message');
+const Room = require('./models/Room');
+const url = require('url');
+
+
 /**
  * Module dependencies.
  */
@@ -176,7 +181,7 @@ app.get('/invite/:token', userController.getInvite);
 app.post('/invite/:token', userController.postInvite);
 app.post('/accounts/:accountId/admin', passportConfig.isAuthenticated, userController.postMakeAdmin)
 app.post('/accounts/:accountId/revoke', passportConfig.isAuthenticated, userController.postRevokeAdmin)
-
+app.post('/accounts/:accountId/add-to-room', passportConfig.isAuthenticated, userController.postAddToRoom)
 
 /**
  * Report routes
@@ -198,13 +203,7 @@ app.delete('/rooms/:roomId', passportConfig.isAuthenticated, roomController.dele
 /**
  * Messages routes
  */
-// app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.getNewMessage)
-// app.post('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.createMessage)
-// app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.listMessages)
-// app.get('/rooms/:roomId/messages/:messageId', passportConfig.isAuthenticated, messageController.deleteMessage)
-
-app.get('/messages', messageController.getMessages)
-app.post('/messages', messageController.postMessages)
+app.get('/rooms/:roomId/messages', passportConfig.isAuthenticated, messageController.getMessages)
 
 /**
  * API examples routes.
@@ -224,6 +223,38 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
+io.on('connection', function (socket) {
+  console.log('New user connected');
+
+  socket.on('new_message', (data) => {
+    socket.username = data.username
+
+    io.sockets.emit('new_message', { message : data.message, username : socket.username })
+
+    Room.findById({ _id: data.roomId }, (err, room) => {
+      if (err) { return next(err); }
+
+      let message = new Message(
+        {
+          message: data.message,
+          username: socket.username
+        }
+      );
+
+      message.save(function (err) {
+        room.messages.push(message);
+        room.save();
+
+        if (err) {
+          return next(err);
+        }
+      });
+
+    });
+
+  })
+});
+
 /**
  * Start Express server.
  */
@@ -232,16 +263,5 @@ server.listen(app.get('port'), () => {
   console.log('  Press CTRL-C to stop\n');
 });
 
-io.on('connection', function (socket) {
-  console.log('New user connected');
-  socket.username = "Anonymous";
-  socket.on('change_username', (data) => {
-    socket.username = data.username;
-  })
-
-  socket.on('new_message', (data) => {
-    io.sockets.emit('new_message', { message : data.message, username : socket.username })
-  })
-});
-
 module.exports = app;
+module.exports = io;
