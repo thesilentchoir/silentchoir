@@ -1,16 +1,19 @@
 extends layout
 
 block content
-  .page-header
-    h3 Messages
+  script(src='http://localhost:8080/socket.io/socket.io.js')
 
   body
-    div.container#main
-      div.row
-        input(type='text', class='form-control', placeholder='Username')#username
-        div.btn-group
-          button.btn-success#send_username Change Username
-        input(type='text', class='form-control', placeholder='Your Message Here')#message
-        div.btn-group
-          button.btn-success#send_message Send
-      div#chatroom
+    div.chat-wrapper
+      .div.header
+        Messages
+      div.chat-body
+        ul.chat-row
+          for message in messages
+            li.message #{message.username}: #{message.message}
+      div.chat-footer
+          input(type='hidden', name='username', id='username', value=username)
+          input(type='hidden', name='roomId', id='roomId', value=roomId)
+          input.form-control(type='message', name='message', id='message')
+          button.btn.btn-primary(id='send_message')
+            | Send
