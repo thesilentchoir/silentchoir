@@ -19,7 +19,8 @@ exports.getMessages = (req, res) => {
 
     if (participantStringsArray.includes(currentUserId)) {
       req.flash('success', { msg: 'Welcome!' });
-      return res.render('messages', { messages: room.messages, username: currentUser });
+      console.log(room.messages);
+      return res.render('messages', { messages: room.messages, username: currentUser, roomId: req.params.roomId });
     } else {
       return res.render('error-forbidden')
     }
