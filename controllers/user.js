@@ -322,27 +322,6 @@ exports.postAddToRoom = (req, res, next) => {
     });
   }
 
-// .exec((err, user) => {
-//   if (err) { return next(err); }
-//   if (!user) {
-//     req.flash('errors', { msg: 'Invitation token is invalid or has expired.' });
-//     return res.redirect('/');
-//   }
-//   user.password = req.body.password;
-//   user.joined = true;
-//   user.inviteAcceptedAt = Date.now();
-//   user.save((err) => {
-//     if (err) {
-//       return next(err);
-//     }
-//     req.flash('success', { msg: 'Profile created successfully.' });
-//     req.logIn(user, (err) => {
-//       if (err) { return next(err); }
-//       req.flash('success', { msg: 'Success! You are logged in.' });
-//       res.redirect('/account');
-//     });
-//   });
-
 exports.getInviteUser = (req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect('/');
